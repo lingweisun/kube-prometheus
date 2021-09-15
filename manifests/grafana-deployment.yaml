@@ -1,3 +1,19 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: grafana-data
+  namespace: monitoring
+  labels:
+    app: grafana
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: gp2
+  volumeMode: Filesystem
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,9 +34,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/grafana-config: e1f5b84a1d40edb8a6527c98d24ff656
-        checksum/grafana-dashboardproviders: 2c7c248e5512bb5576d633004725159c
-        checksum/grafana-datasources: b2cbbea3079b8634b7bdf42cb56c1537
+        checksum/grafana-datasources: eb633dbe89057f52cf1243153e640b1d
       labels:
         app.kubernetes.io/component: grafana
         app.kubernetes.io/name: grafana
@@ -124,9 +138,6 @@ spec:
         - mountPath: /grafana-dashboard-definitions/0/workload-total
           name: grafana-dashboard-workload-total
           readOnly: false
-        - mountPath: /etc/grafana
-          name: grafana-config
-          readOnly: false
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -135,8 +146,9 @@ spec:
         runAsUser: 65534
       serviceAccountName: grafana
       volumes:
-      - emptyDir: {}
-        name: grafana-storage
+      - name: grafana-storage
+        persistentVolumeClaim:
+          claimName: grafana-data
       - name: grafana-datasources
         secret:
           secretName: grafana-datasources
@@ -212,6 +224,3 @@ spec:
       - configMap:
           name: grafana-dashboard-workload-total
         name: grafana-dashboard-workload-total
-      - name: grafana-config
-        secret:
-          secretName: grafana-config
