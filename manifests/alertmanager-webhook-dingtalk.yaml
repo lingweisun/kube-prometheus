@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-webhook-dingtalk-config
+  namespace: monitoring
+data:
+  config.yml: |
+    targets:
+      default:
+        url: https://oapi.dingtalk.com/robot/send?access_token=
+      watchdog:
+        url: https://oapi.dingtalk.com/robot/send?access_token=
+      critical:
+        url: https://oapi.dingtalk.com/robot/send?access_token=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager-webhook-dingtalk
+  namespace: monitoring
+  labels:
+    app: alertmanager-webhook-dingtalk  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager-webhook-dingtalk  
+  template:
+    metadata:
+      labels:
+        app: alertmanager-webhook-dingtalk  
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: alertmanager-webhook-dingtalk-config
+      containers:
+        - name: alertmanager-webhook-dingtalk
+          image: timonwong/prometheus-webhook-dingtalk
+          args:
+            - --web.listen-address=:8060
+            - --config.file=/config/config.yml
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+          ports:
+            - name: http
+              containerPort: 8060
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager-webhook-dingtalk
+  namespace: monitoring
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8060
+  selector:
+    app: alertmanager-webhook-dingtalk
