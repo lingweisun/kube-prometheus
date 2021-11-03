@@ -45,3 +45,14 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   version: 2.29.2
+  retention: '30d'
+  storage:
+    volumeClaimTemplate:
+      apiVersion: 'v1'
+      kind: 'PersistentVolumeClaim'
+      spec:
+        accessModes: ['ReadWriteOnce']
+        resources:
+          requests:
+            storage: '100Gi'
+        storageClassName: 'gp2'
