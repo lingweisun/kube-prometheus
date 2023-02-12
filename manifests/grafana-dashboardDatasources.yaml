@@ -24,4 +24,14 @@ stringData:
             }
         ]
     }
+  loki.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: Loki
+      isDefault: false
+      type: loki
+      access: proxy
+      url: http://loki.monitoring.svc:3100/
+      jsonData:
+        httpHeaderName1: X-Scope-OrgID
 type: Opaque
