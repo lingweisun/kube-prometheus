@@ -55,4 +55,4 @@ spec:
         resources:
           requests:
             storage: '100Gi'
-        storageClassName: 'gp2'
+        storageClassName: 'ebs-sc'

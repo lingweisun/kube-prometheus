@@ -11,7 +11,7 @@ spec:
   resources:
     requests:
       storage: 4Gi
-  storageClassName: gp2
+  storageClassName: ebs-sc
   volumeMode: Filesystem
 ---
 apiVersion: apps/v1
